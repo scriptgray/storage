@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta property="og:title" content="Corvette CDN - 404">
+    <meta property="og:description" content="Recurso privado o no encontrado en cdn.ryuzei.xyz">
+    <meta property="og:image" content="https://github.com/scriptgray.png"> 
+    
+    <title>404 | Corvette Private CDN</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-white: #ffffff; 
+            --background-dark: #000000;
+            --text-secondary: #777777;
+            --border-gray: rgba(255, 255, 255, 0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--background-dark);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Rayos efecto lluvia (chiquitos y rápidos) */
+        #lightning-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-gray);
+            filter: grayscale(100%);
+        }
+
+        /* 404 Negro con Stroke Blanco */
+        .wave-404 {
+            position: relative;
+            font-size: 8rem;
+            font-weight: 900;
+            letter-spacing: -6px;
+            line-height: 1;
+            color: #000; /* Texto Negro */
+            -webkit-text-stroke: 1.5px #fff; /* Borde Blanco */
+            text-transform: uppercase;
+        }
+
+        .wave-404::before {
+            content: "404";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #fff;
+            -webkit-text-stroke: 0px;
+            overflow: hidden;
+            animation: wave 4s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { clip-path: polygon(0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%); }
+            50% { clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%); }
+        }
+
+        h2 { font-size: 1.4rem; margin: 15px 0 10px 0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+        p { color: var(--text-secondary); font-size: 0.9rem; max-width: 400px; margin-bottom: 35px; }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 22px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border-gray);
+            text-align: left;
+        }
+        
+        .info-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+        }
+        
+        .info-content { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.6; }
+        
+        .info-content ul { list-style: none; padding-left: 10px; }
+        
+        .info-content li { margin-bottom: 6px; display: flex; gap: 8px; }
+
+        .info-content li::before { content: '→'; color: #555; }
+
+        .footer {
+            margin-top: 40px;
+            color: #222;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            width: 100%;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="lightning-canvas"></canvas>
+
+    <div class="container">
+        <img src="https://github.com/scriptgray.png" alt="Logo" class="logo-img">
+
+        <div class="wave-404">404</div>
+        
+        <h2>Access Denied</h2>
+        
+        <p>El recurso en <b>cdn.ryuzei.xyz</b> es privado o no existe.</p>
+        
+        <div class="info-box">
+            <div class="info-title">
+                <i class="fas fa-lock"></i>
+                Private Access Control
+            </div>
+            <div class="info-content">
+                <ul>
+                    <li>El CDN es de uso privado (Private Access).</li>
+                    <li>Owner: <b>Corvette</b> | Dev: <b>Ryuzei</b></li>
+                    <li>Only owner.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">2026</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('lightning-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.len = Math.random() * 20 + 5; // Longitud corta
+                this.speed = Math.random() * 10 + 5;
+                this.opacity = 0;
+                this.maxOpacity = Math.random() * 0.5 + 0.2;
+                this.life = 0;
+                this.maxLife = Math.random() * 10 + 5;
+            }
+            draw() {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                // Forma de zigzag pequeña
+                ctx.lineTo(this.x + (Math.random() - 0.5) * 10, this.y + this.len);
+                ctx.stroke();
+            }
+            update() {
+                this.life++;
+                if (this.life < this.maxLife / 2) this.opacity += 0.1;
+                else this.opacity -= 0.1;
+
+                if (this.life >= this.maxLife || this.opacity <= 0) {
+                    this.reset();
+                }
+            }
+        }
+
+        const particles = Array.from({ length: 15 }, () => new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
