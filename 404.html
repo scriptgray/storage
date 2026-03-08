@@ -37,7 +37,6 @@
             position: relative;
         }
 
-        /* Rayos efecto lluvia (chiquitos y rápidos) */
         #lightning-canvas {
             position: absolute;
             top: 0;
@@ -68,34 +67,15 @@
             filter: grayscale(100%);
         }
 
-        /* 404 Negro con Stroke Blanco */
-        .wave-404 {
-            position: relative;
+        /* 404 Blanco Sólido y Minimalista */
+        h1 {
             font-size: 8rem;
             font-weight: 900;
             letter-spacing: -6px;
             line-height: 1;
-            color: #000; /* Texto Negro */
-            -webkit-text-stroke: 1.5px #fff; /* Borde Blanco */
+            color: var(--primary-white);
+            margin: 0;
             text-transform: uppercase;
-        }
-
-        .wave-404::before {
-            content: "404";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: #fff;
-            -webkit-text-stroke: 0px;
-            overflow: hidden;
-            animation: wave 4s ease-in-out infinite;
-        }
-
-        @keyframes wave {
-            0%, 100% { clip-path: polygon(0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%); }
-            50% { clip-path: polygon(0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%); }
         }
 
         h2 { font-size: 1.4rem; margin: 15px 0 10px 0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
@@ -150,7 +130,7 @@
     <div class="container">
         <img src="https://github.com/scriptgray.png" alt="Logo" class="logo-img">
 
-        <div class="wave-404">404</div>
+        <h1>404</h1>
         
         <h2>Access Denied</h2>
         
@@ -186,50 +166,38 @@
         resize();
 
         class Particle {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.len = Math.random() * 20 + 5; // Longitud corta
-                this.speed = Math.random() * 10 + 5;
+                this.len = Math.random() * 15 + 5; 
                 this.opacity = 0;
-                this.maxOpacity = Math.random() * 0.5 + 0.2;
                 this.life = 0;
-                this.maxLife = Math.random() * 10 + 5;
+                this.maxLife = Math.random() * 15 + 5;
             }
             draw() {
                 ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(this.x, this.y);
-                // Forma de zigzag pequeña
-                ctx.lineTo(this.x + (Math.random() - 0.5) * 10, this.y + this.len);
+                ctx.lineTo(this.x + (Math.random() - 0.5) * 8, this.y + this.len);
                 ctx.stroke();
             }
             update() {
                 this.life++;
-                if (this.life < this.maxLife / 2) this.opacity += 0.1;
-                else this.opacity -= 0.1;
-
-                if (this.life >= this.maxLife || this.opacity <= 0) {
-                    this.reset();
-                }
+                if (this.life < this.maxLife / 2) this.opacity += 0.08;
+                else this.opacity -= 0.08;
+                if (this.life >= this.maxLife || this.opacity <= 0) this.reset();
             }
         }
 
-        const particles = Array.from({ length: 15 }, () => new Particle());
+        const particles = Array.from({ length: 12 }, () => new Particle());
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animate);
         }
-
         animate();
     </script>
 </body>
