@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corvette | Storage</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-gray: rgba(255, 255, 255, 0.1);
+            --btn-stroke: #ffffff;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        #lightning-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo-img {
+            width: 70px; height: 70px;
+            border-radius: 20px;
+            border: 1px solid var(--border-gray);
+            filter: grayscale(100%);
+            margin-bottom: 15px;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* --- ANIMACIÓN DE ENTRADA --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-card {
+            background: #000;
+            border: 1px solid var(--btn-stroke);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeUp 0.6s ease forwards;
+            opacity: 0; /* Empieza invisible para la animación */
+        }
+
+        .preview-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-gray);
+            overflow: hidden;
+        }
+
+        .preview-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-info {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .video-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 10px;
+        }
+
+        .btn-copy {
+            display: inline-block;
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #loader { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 50px; }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #222;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="lightning-canvas"></canvas>
+    <div id="toast">URL COPIADA AL PORTAPAPELES</div>
+
+    <div class="container">
+        <header>
+            <img src="https://github.com/scriptgray.png" alt="Logo" class="logo-img">
+            <h1>Storage Explorer</h1>
+        </header>
+
+        <div id="loader">Cargando archivos multimedia...</div>
+        <div class="media-grid" id="media-grid"></div>
+
+        <div class="footer">CORVETTE STORAGE • 2026</div>
+    </div>
+
+    <script>
+        const REPO_API = "https://api.github.com/repos/scriptgray/storage/contents/files";
+        const CDN_BASE = "https://cdn.ryuzei.xyz/files/";
+
+        async function fetchStorage() {
+            try {
+                const response = await fetch(REPO_API);
+                const files = await response.json();
+                const grid = document.getElementById('media-grid');
+                const loader = document.getElementById('loader');
+
+                loader.style.display = 'none';
+
+                files.forEach((file, index) => {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    const isVideo = ['mp4', 'webm', 'mov', 'mkv'].includes(ext);
+                    const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
+                    const isAudio = ['mp3', 'wav', 'ogg'].includes(ext);
+
+                    if (isVideo || isImage || isAudio) {
+                        const card = document.createElement('div');
+                        card.className = 'video-card';
+                        // Retraso de animación escalonado
+                        card.style.animationDelay = `${index * 0.1}s`;
+                        
+                        const cdnUrl = CDN_BASE + file.name;
+
+                        let previewHTML = '';
+                        if (isVideo) {
+                            // Autoplay activado, muteado y en loop para que se vea siempre
+                            previewHTML = `<video class="preview-media" autoplay muted loop playsinline><source src="${file.download_url}"></video>`;
+                        } else if (isImage) {
+                            previewHTML = `<img class="preview-media" src="${file.download_url}" loading="lazy">`;
+                        } else if (isAudio) {
+                            previewHTML = `<div style="font-size: 3rem; color: #222;"><i class="fas fa-music"></i></div>`;
+                        }
+
+                        card.innerHTML = `
+                            <div class="preview-container">${previewHTML}</div>
+                            <div class="video-info">
+                                <div class="video-name">${file.name}</div>
+                                <button class="btn-copy" onclick="copyToClipboard('${cdnUrl}')">
+                                    <i class="fas fa-link"></i> COPIAR URL
+                                </button>
+                            </div>
+                        `;
+                        
+                        grid.appendChild(card);
+                    }
+                });
+            } catch (error) {
+                document.getElementById('loader').innerText = "Error de conexión.";
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        // --- RAYOS CHUQUITOS ---
+        const canvas = document.getElementById('lightning-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.len = Math.random() * 15 + 5; this.opacity = 0;
+                this.life = 0; this.maxLife = Math.random() * 15 + 5;
+            }
+            draw() {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.lineWidth = 1; ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + (Math.random() - 0.5) * 8, this.y + this.len);
+                ctx.stroke();
+            }
+            update() {
+                this.life++;
+                if (this.life < this.maxLife / 2) this.opacity += 0.08;
+                else this.opacity -= 0.08;
+                if (this.life >= this.maxLife || this.opacity <= 0) this.reset();
+            }
+        }
+        const particles = Array.from({ length: 12 }, () => new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        fetchStorage();
+        animate();
+    </script>
+</body>
+</html>
